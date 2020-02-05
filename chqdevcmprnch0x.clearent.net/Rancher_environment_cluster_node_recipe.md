@@ -86,7 +86,7 @@ systemctl start docker
 systemctl enable docker
 
 # install gluster
-yum install -y centos-release-gluster
+yum install -y centos-release-gluster41
 yum install -y glusterfs-server
 systemctl enable glusterd
 systemctl start glusterd
