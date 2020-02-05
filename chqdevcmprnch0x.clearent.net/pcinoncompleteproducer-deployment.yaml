@@ -1,0 +1,60 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    cattle.io/creator: norman
+  name: pcinoncompleteproducer
+  namespace: class-c
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - image: cladocreg01.clearent.net/settlement/pcinoncompleteproducer:20191022.1
+            imagePullPolicy: Always
+            name: pcinoncompleteproducer
+            resources:
+              limits:
+                cpu: "100"
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: {}
+              privileged: false
+              readOnlyRootFilesystem: false
+              runAsNonRoot: false
+            stdin: true
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            tty: true
+            volumeMounts:
+            - mountPath: /app/config
+              name: configs
+            - mountPath: /app/keys
+              name: keys
+          dnsPolicy: ClusterFirst
+          imagePullSecrets:
+          - name: harbor
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - hostPath:
+              path: /git/SettlementConfigurations/DEV
+              type: ""
+            name: configs
+          - hostPath:
+              path: /git/keys
+              type: ""
+            name: keys
+  schedule: 30 14 * * *
+  successfulJobsHistoryLimit: 3
+  suspend: false
+status: {}

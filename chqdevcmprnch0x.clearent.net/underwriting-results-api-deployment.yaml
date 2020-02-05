@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    cattle.io/creator: norman
+    workload.user.cattle.io/workloadselector: deployment-class-a-underwriting-results-api
+  name: underwriting-results-api
+  namespace: class-a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-class-a-underwriting-results-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-class-a-underwriting-results-api
+    spec:
+      containers:
+      - env:
+        - name: KRB5_CLIENT_KTNAME
+          value: /app/keys/sqlauth.keytab
+        - name: KRB5_CONFIG
+          value: /app/keys/krb5.conf
+        image: cladocreg01.clearent.net/settlement/underwriting-results-api:20200115.20.14.35-T31203
+        name: underwriting-results-api
+        resources: {}
+        volumeMounts:
+        - mountPath: /app/config
+          name: configs
+        - mountPath: /app/keys
+          name: keys
+      imagePullSecrets:
+        - name: harbor
+      restartPolicy: Always
+      volumes:
+      - name: configs
+        hostPath:
+          path: /git/SettlementConfigurations/DEV
+      - name: keys
+        hostPath:
+          path: /git/keys
+status: {}

@@ -21,7 +21,6 @@ vgcreate vg_gluster /dev/sdc
 lvcreate -n lv_gluster vg_gluster -l 100%VG
 /sbin/mkfs.xfs /dev/vg_gluster/lv_gluster
 mkdir -p /gluster/brick
-mkdir -p /gluster/configs
 echo "/dev/mapper/vg_gluster-lv_gluster /gluster/brick  xfs defaults  0 0" >> /etc/fstab
 
 mount -a
@@ -86,6 +85,11 @@ yum install -y docker-ce-18.09.5-3.el7.x86_64
 systemctl start docker
 systemctl enable docker
 
+# install gluster
+yum install -y centos-release-gluster
+yum install -y glusterfs-server
+systemctl enable glusterd
+systemctl start glusterd
 
 </pre>
 

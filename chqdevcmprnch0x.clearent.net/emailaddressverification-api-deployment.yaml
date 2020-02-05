@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    cattle.io/creator: norman
+    workload.user.cattle.io/workloadselector: deployment-class-c-emailaddressverification-api
+  name: emailaddressverification-api
+  namespace: class-c
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-class-c-emailaddressverification-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-class-c-emailaddressverification-api
+    spec:
+      containers:
+      - env:
+        - name: KRB5_CLIENT_KTNAME
+          value: /app/keys/horizon.keytab
+        - name: KRB5_CONFIG
+          value: /app/keys/krb5.conf
+        image: cladocreg01.clearent.net/settlement/emailaddressverification-api:20200124.18.55.11-master
+        name: emailaddressverification-api
+        resources: {}
+        volumeMounts:
+        - mountPath: /app/config
+          name: configs
+        - mountPath: /app/keys
+          name: keys
+        - mountPath: /app/responses
+          name: responses
+      imagePullSecrets:
+        - name: harbor
+      restartPolicy: Always
+      volumes:
+      - name: configs
+        hostPath:
+          path: /git/SettlementConfigurations/DEV
+      - name: keys
+        hostPath:
+          path: /git/keys
+      - name: responses
+        hostPath:
+          path: /opt/docker/responses
+status: {}
