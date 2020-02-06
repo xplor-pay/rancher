@@ -4,8 +4,8 @@ metadata:
   creationTimestamp: null
   labels:
     cattle.io/creator: norman
-    workload.user.cattle.io/workloadselector: deployment-class-c-merchant-change-event-producer
-  name: merchant-change-event-producer
+    workload.user.cattle.io/workloadselector: deployment-class-c-pricing-analysis-web
+  name: pricing-analysis-web
   namespace: class-c
 spec:
   progressDeadlineSeconds: 600
@@ -13,7 +13,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-class-c-merchant-change-event-producer
+      workload.user.cattle.io/workloadselector: deployment-class-c-pricing-analysis-web
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -23,22 +23,22 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        workload.user.cattle.io/workloadselector: deployment-class-c-merchant-change-event-producer
+        workload.user.cattle.io/workloadselector: deployment-class-c-pricing-analysis-web
     spec:
       containers:
       - env:
         - name: KRB5_CLIENT_KTNAME
-          value: /app/keys/sqlauth.keytab
+          value: /app/keys/pricing.keytab
         - name: KRB5_CONFIG
           value: /app/keys/krb5.conf
-        image: cladocreg01.clearent.net/settlement/merchant-change-event-producer:29191
-        name: merchant-change-event-producer
+        image: cladocreg01.clearent.net/settlement/pricing-analysis-web:11902
+        name: pricing-analysis-web
         livenessProbe:
           failureThreshold: 3
           httpGet:
             httpHeaders:
             - name: Host
-              value: merchant-change-event-producer
+              value: pricing-analysis-web
             path: /health
             port: 80
             scheme: HTTP
@@ -51,7 +51,7 @@ spec:
           httpGet:
             httpHeaders:
             - name: Host
-              value: merchant-change-event-producer
+              value: pricing-analysis-web
             path: /health
             port: 80
             scheme: HTTP
@@ -61,18 +61,15 @@ spec:
           timeoutSeconds: 2
         resources: {}
         volumeMounts:
-        - mountPath: /app/config
-          name: configs
-        - mountPath: /app/keys
-          name: keys
+        - mountPath: /usr/share/nginx/html/assets/data/PricingAnalysisClientConfig.json
+          name: config
+          readOnly: true
+          subPath: PricingAnalysisClientConfig.json
       imagePullSecrets:
         - name: harbor
       restartPolicy: Always
       volumes:
-      - name: configs
+      - name: config
         persistentVolumeClaim:
           claimName: class-c-settlementconfigurations
-      - name: keys
-        persistentVolumeClaim:
-          claimName: class-c-keys
 status: {}

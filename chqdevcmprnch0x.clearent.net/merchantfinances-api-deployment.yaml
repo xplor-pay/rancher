@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    cattle.io/creator: norman
+    workload.user.cattle.io/workloadselector: deployment-class-a-merchant-finances-api
+  name: merchant-finances-api
+  namespace: class-a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-class-a-merchant-finances-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-class-a-merchant-finances-api
+    spec:
+      containers:
+      - env:
+        - name: KRB5_CLIENT_KTNAME
+          value: /app/keys/pricing.keytab
+        - name: KRB5_CONFIG
+          value: /app/keys/krb5.conf
+        image: cladocreg01.clearent.net/settlement/merchant-finances-api:20181010.1
+        name: merchant-finances-api
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: merchant-finances-api
+            path: /api/healthreport
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 2
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: merchant-finances-api
+            path: /api/healthreport
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 2
+          successThreshold: 2
+          timeoutSeconds: 2
+        resources: {}
+        volumeMounts:
+        - mountPath: /app/config
+          name: configs
+        - mountPath: /app/keys
+          name: keys
+      imagePullSecrets:
+        - name: harbor
+      restartPolicy: Always
+      volumes:
+      - name: configs
+        persistentVolumeClaim:
+          claimName: class-a-settlementconfigurations
+      - name: keys
+        persistentVolumeClaim:
+          claimName: class-a-keys
+status: {}
