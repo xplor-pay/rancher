@@ -33,6 +33,32 @@ spec:
           value: /app/keys/krb5.conf
         image: cladocreg01.clearent.net/settlement/emailaddressverification-api:20200124.18.55.11-master
         name: emailaddressverification-api
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: emailaddressverification-api
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 6
+          successThreshold: 1
+          timeoutSeconds: 2
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: emailaddressverification-api
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 6
+          successThreshold: 2
+          timeoutSeconds: 2
         resources: {}
         volumeMounts:
         - mountPath: /app/config
@@ -46,11 +72,11 @@ spec:
       restartPolicy: Always
       volumes:
       - name: configs
-        hostPath:
-          path: /git/SettlementConfigurations/DEV
+        persistentVolumeClaim:
+          claimName: class-c-settlementconfigurations
       - name: keys
-        hostPath:
-          path: /git/keys
+        persistentVolumeClaim:
+          claimName: class-c-keys
       - name: responses
         hostPath:
           path: /opt/docker/responses

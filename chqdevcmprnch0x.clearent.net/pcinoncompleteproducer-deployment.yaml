@@ -46,14 +46,12 @@ spec:
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-          - hostPath:
-              path: /git/SettlementConfigurations/DEV
-              type: ""
-            name: configs
-          - hostPath:
-              path: /git/keys
-              type: ""
-            name: keys
+          - name: configs
+            persistentVolumeClaim:
+              claimName: class-c-settlementconfigurations
+          - name: keys
+            persistentVolumeClaim:
+              claimName: class-c-keys
   schedule: 30 14 * * *
   successfulJobsHistoryLimit: 3
   suspend: false

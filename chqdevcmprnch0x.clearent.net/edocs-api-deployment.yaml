@@ -9,7 +9,7 @@ metadata:
   namespace: class-a
 spec:
   progressDeadlineSeconds: 600
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -32,7 +32,33 @@ spec:
         - name: KRB5_CONFIG
           value: /app/keys/krb5.conf
         image: cladocreg01.clearent.net/settlement/edocs-api:20191212.22.8.48-T31200-TUPrintImage
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: edocs-v2-dev.clearent.net
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 2
         name: edocs-api
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: edocs-v2-dev.clearent.net
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 2
+          successThreshold: 2
+          timeoutSeconds: 2
         resources: {}
         volumeMounts:
         - mountPath: /app/config
@@ -44,9 +70,9 @@ spec:
       restartPolicy: Always
       volumes:
       - name: configs
-        hostPath:
-          path: /git/SettlementConfigurations/DEV
+        persistentVolumeClaim:
+          claimName: class-a-settlementconfigurations
       - name: keys
-        hostPath:
-          path: /git/keys
+        persistentVolumeClaim:
+          claimName: class-a-keys
 status: {}

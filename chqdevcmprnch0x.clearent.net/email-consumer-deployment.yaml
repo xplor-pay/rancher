@@ -44,9 +44,9 @@ spec:
       restartPolicy: Always
       volumes:
       - name: configs
-        hostPath:
-          path: /git/SettlementConfigurations/DEV
+        persistentVolumeClaim:
+          claimName: class-b-settlementconfigurations
       - name: keys
-        hostPath:
-          path: /git/keys
+        persistentVolumeClaim:
+          claimName: class-b-keys
 status: {}

@@ -33,6 +33,32 @@ spec:
           value: /app/keys/krb5.conf
         image: cladocreg01.clearent.net/settlement/merchantimport-api:20191107.17.32.22-T30012
         name: merchantimport-api
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: merchantimport-api
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 2
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: Host
+              value: merchantimport-api
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 2
+          successThreshold: 2
+          timeoutSeconds: 2
         resources: {}
         volumeMounts:
         - mountPath: /app/config
@@ -44,9 +70,9 @@ spec:
       restartPolicy: Always
       volumes:
       - name: configs
-        hostPath:
-          path: /git/SettlementConfigurations/DEV
+        persistentVolumeClaim:
+          claimName: class-b-settlementconfigurations
       - name: keys
-        hostPath:
-          path: /git/keys
+        persistentVolumeClaim:
+          claimName: class-b-keys
 status: {}
