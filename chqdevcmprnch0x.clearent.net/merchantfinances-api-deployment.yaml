@@ -28,7 +28,7 @@ spec:
       containers:
       - env:
         - name: KRB5_CLIENT_KTNAME
-          value: /app/keys/pricing.keytab
+          value: /app/keys/sqlauth.keytab
         - name: KRB5_CONFIG
           value: /app/keys/krb5.conf
         image: cladocreg01.clearent.net/settlement/merchant-finances-api:20181010.1
@@ -69,10 +69,14 @@ spec:
         - name: harbor
       restartPolicy: Always
       volumes:
-      - name: configs
-        persistentVolumeClaim:
-          claimName: class-a-settlementconfigurations
       - name: keys
-        persistentVolumeClaim:
-          claimName: class-a-keys
+        secret:
+          defaultMode: 256
+          optional: false
+          secretName: keys
+      - configMap:
+          defaultMode: 256
+          name: configs
+          optional: false
+        name: configs
 status: {}

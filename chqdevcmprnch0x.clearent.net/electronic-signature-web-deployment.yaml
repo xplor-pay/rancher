@@ -63,21 +63,13 @@ spec:
         volumeMounts:
         - mountPath: /app/config
           name: configs
-        - mountPath: /app/keys
-          name: keys
-        - mountPath: /app/responses
-          name: responses
       imagePullSecrets:
         - name: harbor
       restartPolicy: Always
       volumes:
-      - name: configs
-        persistentVolumeClaim:
-          claimName: class-a-settlementconfigurations
-      - name: keys
-        persistentVolumeClaim:
-          claimName: class-a-keys
-      - name: responses
-        hostPath:
-          path: /opt/docker/responses
+      - configMap:
+          defaultMode: 256
+          name: configs
+          optional: false
+        name: config
 status: {}

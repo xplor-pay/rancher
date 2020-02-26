@@ -71,13 +71,18 @@ spec:
         - name: harbor
       restartPolicy: Always
       volumes:
-      - name: configs
-        persistentVolumeClaim:
-          claimName: class-c-settlementconfigurations
-      - name: keys
-        persistentVolumeClaim:
-          claimName: class-c-keys
-      - name: responses
-        hostPath:
+      - hostPath:
           path: /opt/docker/responses
+          type: ""
+        name: responses
+      - configMap:
+          defaultMode: 256
+          name: configs
+          optional: false
+        name: configs
+      - name: keys
+        secret:
+          defaultMode: 256
+          optional: false
+          secretName: keys
 status: {}

@@ -69,10 +69,14 @@ spec:
         - name: harbor
       restartPolicy: Always
       volumes:
-      - name: configs
-        persistentVolumeClaim:
-          claimName: class-b-settlementconfigurations
+      - configMap:
+          defaultMode: 256
+          name: configs
+          optional: false
+        name: configs
       - name: keys
-        persistentVolumeClaim:
-          claimName: class-b-keys
+        secret:
+          defaultMode: 256
+          optional: false
+          secretName: keys
 status: {}

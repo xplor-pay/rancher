@@ -69,7 +69,12 @@ spec:
         - name: harbor
       restartPolicy: Always
       volumes:
-      - name: config
-        persistentVolumeClaim:
-          claimName: class-a-settlementconfigurations
+      - configMap:
+          defaultMode: 256
+          items:
+          - key: UnderwritingResultsClientConfig.json
+            path: UnderwritingResultsClientConfig.json
+          name: configs
+          optional: false
+        name: config
 status: {}
