@@ -15,14 +15,6 @@ lvcreate -n lv_docker vg_docker -l 100%VG
 mkdir -p /var/lib/docker
 echo "/dev/mapper/vg_docker-lv_docker  /var/lib/docker  xfs defaults 0 0" >> /etc/fstab
 
-#create the gluster volume
-pvcreate /dev/sdc
-vgcreate vg_gluster /dev/sdc
-lvcreate -n lv_gluster vg_gluster -l 100%VG
-/sbin/mkfs.xfs /dev/vg_gluster/lv_gluster
-mkdir -p /gluster/brick
-echo "/dev/mapper/vg_gluster-lv_gluster /gluster/brick  xfs defaults  0 0" >> /etc/fstab
-
 mount -a
 
 tee /etc/firewalld/services/rancher_controlplane.xml << EOF
@@ -59,22 +51,8 @@ tee /etc/firewalld/services/rancher_etcd.xml << EOF
 </service>
 EOF
 
-tee /etc/firewalld/services/rancher_gluster.xml << EOF
-<?xml version="1.0" encoding="utf-8"?>
-<service>
-  <short>Rancher gluster node</short>
-  <description>Ports required for the Gluster storage cluster</description>
-  <port protocol="tcp" port="24007"/>
-  <port protocol="tcp" port="24008"/>
-  <port protocol="tcp" port="49152"/>
-  <port protocol="tcp" port="49153"/>
-  <port protocol="tcp" port="49154"/>
-</service>
-EOF
-
 /bin/firewall-cmd --zone=public --add-service rancher_controlplane --permanent
 /bin/firewall-cmd --zone=public --add-service rancher_etcd --permanent
-/bin/firewall-cmd --zone=public --add-service rancher_gluster --permanent
 /bin/firewall-cmd --reload
 
 yum-config-manager \
@@ -84,12 +62,6 @@ yum-config-manager \
 yum install -y docker-ce-18.09.5-3.el7.x86_64
 systemctl start docker
 systemctl enable docker
-
-# install gluster
-yum install -y centos-release-gluster41
-yum install -y glusterfs-server
-systemctl enable glusterd
-systemctl start glusterd
 
 </pre>
 
