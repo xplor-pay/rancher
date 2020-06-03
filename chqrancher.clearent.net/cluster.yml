@@ -54,13 +54,13 @@ authentication:
   sans: []
 addons: ""
 addons_include: []
-ssh_key_path: /home/rancher/.ssh/id_rsa
+ssh_key_path: id_rsa
 ssh_agent_auth: false
 authorization:
   mode: rbac
   options: {}
 ignore_docker_version: false
-kubernetes_version: "v1.15.6-rancher1-2"
+kubernetes_version: "v1.17.0-rancher1-2"
 private_registries: []
 ingress:
   provider: ""
