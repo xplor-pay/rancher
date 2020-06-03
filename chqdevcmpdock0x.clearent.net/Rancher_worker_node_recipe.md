@@ -26,7 +26,7 @@ tee /etc/firewalld/services/rancher_worker.xml << EOF
   <port protocol="tcp" port="80"/>
   <port protocol="tcp" port="443"/>
   <port protocol="tcp" port="2376"/>
-  <port protocol="tcp" port="8472"/>
+  <port protocol="udp" port="8472"/>
   <port protocol="tcp" port="9099"/>
   <port protocol="tcp" port="10250"/>
   <port protocol="tcp" port="10254"/>
