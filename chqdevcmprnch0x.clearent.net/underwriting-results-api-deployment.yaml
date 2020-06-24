@@ -1,10 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
-  labels:
-    cattle.io/creator: norman
-    workload.user.cattle.io/workloadselector: deployment-class-a-underwriting-results-api
   name: underwriting-results-api
   namespace: class-a
 spec:
@@ -13,7 +9,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-class-a-underwriting-results-api
+      app: underwriting-results-api
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -21,9 +17,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        workload.user.cattle.io/workloadselector: deployment-class-a-underwriting-results-api
+        app: underwriting-results-api
     spec:
       containers:
       - env:
@@ -31,7 +26,7 @@ spec:
           value: /app/keys/sqlauth.keytab
         - name: KRB5_CONFIG
           value: /app/keys/krb5.conf
-        image: cladocreg01.clearent.net/settlement/underwriting-results-api:20200115.20.14.35-T31203
+        image: ${REGISTRY_NAME}/settlement/underwriting-results-api:${BUILD_BUILDNUMBER}
         name: underwriting-results-api
         livenessProbe:
           failureThreshold: 3
@@ -59,24 +54,29 @@ spec:
           periodSeconds: 2
           successThreshold: 2
           timeoutSeconds: 2
-        resources: {}
+        resources:
+          limits:
+            cpu: 1500m
+            memory: 512Mi
+          requests:
+            cpu: 500m
+            memory: 128Mi
         volumeMounts:
         - mountPath: /app/config
           name: configs
         - mountPath: /app/keys
           name: keys
       imagePullSecrets:
-        - name: harbor
+        - name: azurecr
       restartPolicy: Always
       volumes:
       - configMap:
           defaultMode: 256
           name: configs
           optional: false
-        name: config
+        name: configs
       - name: keys
         secret:
           defaultMode: 256
           optional: false
           secretName: keys
-status: {}
